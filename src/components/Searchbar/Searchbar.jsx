@@ -1,4 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+
 //import 'components/Searchbar/Searchbar.css';
 
 export class Searchbar extends React.Component {
@@ -12,8 +15,8 @@ export class Searchbar extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    if (this.state.imageSearch.trim === '') {
-      return;
+    if (this.state.imageSearch.trim() === '') {
+      return toast.error('Please fill in the field!');
     }
     this.props.onSubmit(this.state.imageSearch);
     this.setState({ imageSearch: '' });
@@ -41,3 +44,7 @@ export class Searchbar extends React.Component {
     );
   }
 }
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
