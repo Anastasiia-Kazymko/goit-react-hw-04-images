@@ -1,32 +1,71 @@
 import React from 'react';
-import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
-//import Loader from 'components/Loader/Loader';
+import { toast } from 'react-toastify';
+import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
+import Loader from 'components/Loader/Loader';
+import Button from 'components/Button/Button';
 
 export class ImageGallery extends React.Component {
   state = {
     arrayOfPictures: null,
     page: 1,
-    loading: false,
+    error: null,
+    status: 'idle',
   };
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.imageSearch !== this.props.imageSearch) {
-      this.setState({ loading: true });
+    const prevName = prevProps.imageSearch;
+    const nextName = this.props.imageSearch;
+    if (prevName !== nextName) {
+      this.setState({ status: 'pending', page: 1 });
 
       fetch(
-        `https://pixabay.com/api/?key=27577235-c9daade09bc67e8d645cf910b&q=${this.props.imageSearch}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12&page=${this.state.page}`
+        `https://pixabay.com/api/?key=27577235-c9daade09bc67e8d645cf910b&q=${nextName}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12&page=${this.state.page}`
       )
-        .then(res => res.json())
+        .then(responce => responce.json())
         .then(object => {
-          this.setState({ arrayOfPictures: object.hits });
+          this.setState({ arrayOfPictures: object.hits, status: 'resolved' });
         })
-        .finally(() => this.setState({ loading: false }));
+        .catch(error => this.setState({ error, status: 'rejected' }));
     }
+
+    getImages = () => {
+      fetch(
+        `https://pixabay.com/api/?key=27577235-c9daade09bc67e8d645cf910b&q=${nextName}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12&page=${this.state.page}`
+      )
+        .then(responce => responce.json())
+        .then(object => {
+          this.setState(({ arrayOfPictures, page }) => ({
+            arrayOfPictures: [...arrayOfPictures, ...object],
+            status: 'resolved',
+            page: page + 1,
+          }));
+        })
+        .catch(error => this.setState({ error, status: 'rejected' }));
+    };
+
+    onLoadMore = () => {
+      this.getImages();
+    };
   }
   render() {
-    return (
-      <ul>
-        <ImageGalleryItem arrayOfPictures={this.state.arrayOfPictures} />
-      </ul>
-    );
+    const { status, arrayOfPictures } = this.state;
+
+    if (status === 'pending') {
+      return <Loader />;
+    }
+    if (status === 'resolved') {
+      if (arrayOfPictures.length === 0) {
+        return toast.error(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      }
+      return (
+        <>
+          <ul>
+            <ImageGalleryItem arrayOfPictures={arrayOfPictures} />
+          </ul>
+          {<Button onLoadMore={this.onLoadMore()} />}
+        </>
+      );
+    }
   }
 }

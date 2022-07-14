@@ -1,9 +1,16 @@
 import React from 'react';
-import { RotatingLines } from 'react-loader-spinner';
+import { ThreeCircles } from 'react-loader-spinner';
 
-const Loader = () => (
-  <div>
-    <RotatingLines width="100" />
-  </div>
-);
-export default Loader;
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+
+export default function Loader() {
+  return (
+    <ThreeCircles
+      color="red"
+      outerCircleColor="yellow"
+      middleCircleColor="grey"
+      innerCircleColor="blue"
+      style={{ textAlign: 'center' }}
+    />
+  );
+}

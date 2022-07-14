@@ -1,9 +1,9 @@
-/* export const Filter = ({ onFilter, value }) => {
+import React from 'react';
+
+export default function Button({ onLoadMore }) {
   return (
-    <>
-      <p>Find contacts by name</p>
-      <input type="text" name="filter" value={value} onChange={onFilter} />
-    </>
+    <button type="button" onClick={onLoadMore}>
+      Load more
+    </button>
   );
-};
- */
+}
