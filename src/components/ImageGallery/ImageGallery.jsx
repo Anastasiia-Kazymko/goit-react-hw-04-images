@@ -26,26 +26,26 @@ export class ImageGallery extends React.Component {
         })
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
-
-    getImages = () => {
-      fetch(
-        `https://pixabay.com/api/?key=27577235-c9daade09bc67e8d645cf910b&q=${nextName}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12&page=${this.state.page}`
-      )
-        .then(responce => responce.json())
-        .then(object => {
-          this.setState(({ arrayOfPictures, page }) => ({
-            arrayOfPictures: [...arrayOfPictures, ...object],
-            status: 'resolved',
-            page: page + 1,
-          }));
-        })
-        .catch(error => this.setState({ error, status: 'rejected' }));
-    };
-
-    onLoadMore = () => {
-      this.getImages();
-    };
   }
+  getImages = () => {
+    fetch(
+      `https://pixabay.com/api/?key=27577235-c9daade09bc67e8d645cf910b&q=${this.props.imageSearch}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12&page=${this.state.page}`
+    )
+      .then(responce => responce.json())
+      .then(object => {
+        this.setState(prevState => ({
+          arrayOfPictures: [...prevState.arrayOfPictures, ...object],
+          status: 'resolved',
+          page: prevState.page + 1,
+        }));
+      })
+      .catch(error => this.setState({ error, status: 'rejected' }));
+  };
+
+  onLoadMore = () => {
+    this.getImages();
+  };
+
   render() {
     const { status, arrayOfPictures } = this.state;
 
