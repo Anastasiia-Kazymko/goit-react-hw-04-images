@@ -4,7 +4,6 @@ import {
 } from 'components/ImageGalleryItem/ImageGalleryItem.styled';
 
 export function ImageGalleryItem({ arrayOfPictures }) {
-  //console.log(arrayOfPictures);
   if (arrayOfPictures) {
     let markup = arrayOfPictures.map(el => {
       return (

@@ -4,6 +4,7 @@ import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import Loader from 'components/Loader/Loader';
 import Button from 'components/Button/Button';
 import { Gallery } from 'components/ImageGallery/ImageGalleryItem.styled';
+import { requestFetch } from 'components/services/fetch-pictures';
 
 export class ImageGallery extends React.Component {
   state = {
@@ -21,20 +22,31 @@ export class ImageGallery extends React.Component {
     const prevName = prevProps.imageSearch;
     const nextName = this.props.imageSearch;
 
-    if (prevName !== nextName || prevState.page !== this.state.page) {
-      this.setState({ status: 'pending' });
+    if (prevName !== nextName) {
+      this.setState({ status: 'pending', page: 1 });
 
-      fetch(
-        `https://pixabay.com/api/?key=27577235-c9daade09bc67e8d645cf910b&q=${nextName}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12&page=${this.state.page}`
-      )
-        .then(responce => responce.json())
+      requestFetch(nextName, this.state.page)
         .then(object => {
-          this.setState(prevState => ({
-            arrayOfPictures: [...prevState.arrayOfPictures, ...object.hits],
+          if (object.hits.length === 0) {
+            return toast.error(
+              'Sorry, there are no images matching your search query. Please try again.'
+            );
+          }
+          this.setState(() => ({
+            arrayOfPictures: object.hits,
             status: 'resolved',
           }));
         })
         .catch(error => this.setState({ error, status: 'rejected' }));
+    }
+    if (prevState.page !== this.state.page) {
+      requestFetch(nextName, this.state.page + 1).then(object => {
+        this.setState(prevState => {
+          return {
+            arrayOfPictures: [...prevState.arrayOfPictures, ...object.hits],
+          };
+        });
+      });
     }
   }
 
@@ -45,11 +57,6 @@ export class ImageGallery extends React.Component {
       return <Loader />;
     }
     if (status === 'resolved') {
-      if (arrayOfPictures.length === 0) {
-        return toast.error(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-      }
       return (
         <>
           <Gallery>
