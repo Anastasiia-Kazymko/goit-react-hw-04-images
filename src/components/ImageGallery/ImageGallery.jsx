@@ -11,11 +11,16 @@ export class ImageGallery extends React.Component {
     error: null,
     status: 'idle',
   };
+
+  onLoadMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
+
   componentDidUpdate(prevProps, prevState) {
     const prevName = prevProps.imageSearch;
     const nextName = this.props.imageSearch;
-    if (prevName !== nextName) {
-      this.setState({ status: 'pending', page: 1 });
+    if (prevName !== nextName || prevState.page !== this.state.page) {
+      this.setState({ status: 'pending' });
 
       fetch(
         `https://pixabay.com/api/?key=27577235-c9daade09bc67e8d645cf910b&q=${nextName}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12&page=${this.state.page}`
@@ -27,24 +32,6 @@ export class ImageGallery extends React.Component {
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
-  getImages = () => {
-    fetch(
-      `https://pixabay.com/api/?key=27577235-c9daade09bc67e8d645cf910b&q=${this.props.imageSearch}&image_type=photo&orientation=horizontal&safesearch=true&per_page=12&page=${this.state.page}`
-    )
-      .then(responce => responce.json())
-      .then(object => {
-        this.setState(prevState => ({
-          arrayOfPictures: [...prevState.arrayOfPictures, ...object],
-          status: 'resolved',
-          page: prevState.page + 1,
-        }));
-      })
-      .catch(error => this.setState({ error, status: 'rejected' }));
-  };
-
-  onLoadMore = () => {
-    this.getImages();
-  };
 
   render() {
     const { status, arrayOfPictures } = this.state;
