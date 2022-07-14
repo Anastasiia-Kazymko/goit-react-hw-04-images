@@ -9,7 +9,7 @@ export function ImageGalleryItem({ arrayOfPictures }) {
     let markup = arrayOfPictures.map(el => {
       return (
         <ImageEl key={el.id}>
-          <Image src={el.webformatURL} alt={el.tags} width="100px" />
+          <Image src={el.webformatURL} alt={el.tags} />
         </ImageEl>
       );
     });

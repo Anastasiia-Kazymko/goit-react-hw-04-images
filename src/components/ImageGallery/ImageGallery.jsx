@@ -3,10 +3,11 @@ import { toast } from 'react-toastify';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import Loader from 'components/Loader/Loader';
 import Button from 'components/Button/Button';
+import { Gallery } from 'components/ImageGallery/ImageGalleryItem.styled';
 
 export class ImageGallery extends React.Component {
   state = {
-    arrayOfPictures: null,
+    arrayOfPictures: [],
     page: 1,
     error: null,
     status: 'idle',
@@ -19,6 +20,7 @@ export class ImageGallery extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     const prevName = prevProps.imageSearch;
     const nextName = this.props.imageSearch;
+
     if (prevName !== nextName || prevState.page !== this.state.page) {
       this.setState({ status: 'pending' });
 
@@ -27,7 +29,10 @@ export class ImageGallery extends React.Component {
       )
         .then(responce => responce.json())
         .then(object => {
-          this.setState({ arrayOfPictures: object.hits, status: 'resolved' });
+          this.setState(prevState => ({
+            arrayOfPictures: [...prevState.arrayOfPictures, ...object.hits],
+            status: 'resolved',
+          }));
         })
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
@@ -47,10 +52,10 @@ export class ImageGallery extends React.Component {
       }
       return (
         <>
-          <ul>
+          <Gallery>
             <ImageGalleryItem arrayOfPictures={arrayOfPictures} />
-          </ul>
-          {<Button onLoadMore={this.onLoadMore()} />}
+            {<Button onLoadMore={this.onLoadMore} />}
+          </Gallery>
         </>
       );
     }
