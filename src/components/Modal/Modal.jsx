@@ -1,11 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-export default class Modal extends Component {
+import { Overlay, Picture } from 'components/Modal/Modal.styled';
+
+export default class Modal extends React.Component {
+  render() {
+    console.log(this.props.src);
+    console.log(this.props.tags);
+    //const { src, tags } = this.props;
     return (
-      /* <div className="Overlay" onClick={this.handleCloseModal}>
-        <div className="Modal">
-          <img src={src} alt={alt} />
-        </div>
-      </div> */
+      <Overlay>
+        <Picture src={this.props.src} alt={this.props.tags} />
+      </Overlay>
     );
+  }
 }

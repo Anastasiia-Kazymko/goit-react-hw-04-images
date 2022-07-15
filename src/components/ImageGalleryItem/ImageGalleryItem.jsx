@@ -1,18 +1,21 @@
+import React, { Component } from 'react';
 import {
   ImageEl,
   Image,
 } from 'components/ImageGalleryItem/ImageGalleryItem.styled';
 
-export function ImageGalleryItem({ arrayOfPictures }) {
-  if (arrayOfPictures) {
-    let markup = arrayOfPictures.map(el => {
-      return (
-        <ImageEl key={el.id}>
-          <Image src={el.webformatURL} alt={el.tags} />
-        </ImageEl>
-      );
-    });
+export default class ImageGalleryItem extends Component {
+  handleClick = () => {
+    this.props.onClick(this.props.largeImageURL, this.props.tags);
+  };
 
-    return markup;
+  render() {
+    const { id, webformatURL, tags } = this.props;
+
+    return (
+      <ImageEl key={id}>
+        <Image src={webformatURL} alt={tags} onClick={this.handleClick} />
+      </ImageEl>
+    );
   }
 }

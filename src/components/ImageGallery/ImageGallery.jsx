@@ -1,8 +1,9 @@
 import React from 'react';
 import { toast } from 'react-toastify';
-import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
+import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import Loader from 'components/Loader/Loader';
 import Button from 'components/Button/Button';
+import Modal from 'components/Modal/Modal';
 import { Gallery } from 'components/ImageGallery/ImageGalleryItem.styled';
 import { requestFetch } from 'components/services/fetch-pictures';
 
@@ -12,10 +13,23 @@ export class ImageGallery extends React.Component {
     page: 1,
     error: null,
     status: 'idle',
+    showModal: false,
+    largeImageURL: '',
+    imageTag: '',
   };
 
   onLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
+
+  onOpenModal = (url, tags) => {
+    this.setState({ largeImageURL: url, imageTag: tags });
+
+    this.modalToggle();
+  };
+
+  modalToggle = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -25,9 +39,10 @@ export class ImageGallery extends React.Component {
     if (prevName !== nextName) {
       this.setState({ status: 'pending', page: 1 });
 
-      requestFetch(nextName, this.state.page)
+      requestFetch(nextName, 1)
         .then(object => {
           if (object.hits.length === 0) {
+            this.setState({ status: 'rejected' });
             return toast.error(
               'Sorry, there are no images matching your search query. Please try again.'
             );
@@ -51,7 +66,8 @@ export class ImageGallery extends React.Component {
   }
 
   render() {
-    const { status, arrayOfPictures } = this.state;
+    const { status, arrayOfPictures, showModal, largeImageURL, imageTag } =
+      this.state;
 
     if (status === 'pending') {
       return <Loader />;
@@ -60,7 +76,25 @@ export class ImageGallery extends React.Component {
       return (
         <>
           <Gallery>
-            <ImageGalleryItem arrayOfPictures={arrayOfPictures} />
+            {arrayOfPictures.map(
+              ({ id, tags, webformatURL, largeImageURL }) => (
+                <ImageGalleryItem
+                  key={id}
+                  id={id}
+                  tags={tags}
+                  webformatURL={webformatURL}
+                  largeImageURL={largeImageURL}
+                  onClick={this.onOpenModal}
+                />
+              )
+            )}
+            {showModal && (
+              <Modal
+                src={largeImageURL}
+                tags={imageTag}
+                onCloseModal={this.modalToggle}
+              />
+            )}
             {<Button onLoadMore={this.onLoadMore} />}
           </Gallery>
         </>
