@@ -3,13 +3,24 @@ import React from 'react';
 import { Overlay, Picture } from 'components/Modal/Modal.styled';
 
 export default class Modal extends React.Component {
+  componentDidMount() {
+    window.addEventListener('keydown', this.handleCloseModal);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleCloseModal);
+  }
+
+  handleCloseModal = e => {
+    if (e.code === 'Escape' || e.target === e.currentTarget) {
+      this.props.onCloseModal();
+    }
+  };
   render() {
-    console.log(this.props.src);
-    console.log(this.props.tags);
-    //const { src, tags } = this.props;
+    const { src, tags } = this.props;
     return (
-      <Overlay>
-        <Picture src={this.props.src} alt={this.props.tags} />
+      <Overlay onClick={this.handleCloseModal}>
+        <Picture src={src} alt={tags} />
       </Overlay>
     );
   }
