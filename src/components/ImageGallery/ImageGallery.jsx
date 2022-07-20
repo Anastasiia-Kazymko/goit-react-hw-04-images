@@ -56,9 +56,12 @@ export default function ImageGaller({ imageSearch }) {
       return;
     }
     requestFetch(imageSearch, page + 1).then(object => {
-      setArrayOfPictures([...arrayOfPictures, ...object.hits]);
+      setArrayOfPictures(ArrayOfPictures => [
+        ...ArrayOfPictures,
+        ...object.hits,
+      ]);
     });
-  }, [page, imageSearch, arrayOfPictures]);
+  }, [page]);
 
   if (status === 'pending') {
     return <Loader />;
