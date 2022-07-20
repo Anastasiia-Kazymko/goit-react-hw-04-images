@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import {
@@ -9,46 +9,40 @@ import {
   ButtonLabel,
 } from 'components/Searchbar/Searchbar.styled';
 
-//import 'components/Searchbar/Searchbar.css';
+export default function Searchbar({ onSubmit }) {
+  const [imageSearch, setImageSearch] = useState('');
 
-export class Searchbar extends React.Component {
-  state = {
-    imageSearch: '',
+  const handleNameChange = e => {
+    setImageSearch(e.currentTarget.value.toLowerCase());
   };
 
-  handleNameChange = e => {
-    this.setState({ imageSearch: e.currentTarget.value.toLowerCase() });
-  };
-
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    if (this.state.imageSearch.trim() === '') {
+    if (imageSearch.trim() === '') {
       return toast.error('Please fill in the field!');
     }
-    this.props.onSubmit(this.state.imageSearch);
-    this.setState({ imageSearch: '' });
+    onSubmit(imageSearch);
+    setImageSearch('');
   };
 
-  render() {
-    return (
-      <SearchMenu>
-        <Form onSubmit={this.handleSubmit}>
-          <SearchButton type="submit">
-            <ButtonLabel>Search</ButtonLabel>
-          </SearchButton>
-          <SearchInput
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            name="imageSearch"
-            value={this.state.imageSearch}
-            onChange={this.handleNameChange}
-          />
-        </Form>
-      </SearchMenu>
-    );
-  }
+  return (
+    <SearchMenu>
+      <Form onSubmit={handleSubmit}>
+        <SearchButton type="submit">
+          <ButtonLabel>Search</ButtonLabel>
+        </SearchButton>
+        <SearchInput
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          name="imageSearch"
+          value={imageSearch}
+          onChange={handleNameChange}
+        />
+      </Form>
+    </SearchMenu>
+  );
 }
 
 Searchbar.propTypes = {
